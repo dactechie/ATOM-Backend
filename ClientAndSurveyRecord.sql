@@ -36,21 +36,22 @@ CREATE table Survey (
   HaveYouServedCustodialSentenceInPast bit, -- not on client because it is useful to know when they had/declared it
   EverDiagnosedMentalHealthIssue bit, -- ? -- not on client because it is useful to know when they had/declared it
  
+  UNIQUE (ClientId, AssessmentDate, ProgramId)
 );
 
 
-  --drop table ClientCurrentSituation -- A2
-  --drop table DrugOfConcern --B2
-  --drop table InjectingDrugDetails --C2
-  --drop table OtherBehavioursOfDependence --D2
-  --drop table RecentLifestyleImpactConcern -- E2
-  --drop table SDS -- F2
-  --drop table ClientEngagement -- G2
-  --drop table CurrentStageReview -- H2
-  --drop table PrimaryCaregiverDetail -- I2
-  --drop table ClientRisk -- J2
-  --drop table SupportForGoals -- K2
-  --drop table Survey-- Level-1
+  -- drop table ClientCurrentSituation -- A2
+  -- drop table DrugOfConcern --B2
+  -- drop table InjectingDrugDetails --C2
+  -- drop table OtherBehavioursOfDependence --D2
+  -- drop table RecentLifestyleImpactConcern -- E2
+  -- drop table SDS -- F2
+  -- drop table ClientEngagement -- G2
+  -- drop table CurrentStageReview -- H2
+  -- drop table PrimaryCaregiverDetail -- I2
+  -- drop table ClientRisk -- J2
+  -- drop table SupportForGoals -- K2
+  -- drop table Survey-- Level-1
   --drop table Client
 
 -- SupportTypeBestMatchesNeedsGoals
