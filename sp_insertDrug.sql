@@ -1,10 +1,11 @@
 alter PROCEDURE sp_insertDrug(
-						@surveyId int
-						,@DrugJSON nvarchar(max)
+						@DrugJSON nvarchar(max)
 						,@concernRank tinyint
+						,@drugOfConcernId int output
 						)
 as 
-begin 
+begin
+	 DECLARE @IDs TABLE(ID INT);
 	 DECLARE @DrugKey as varchar(40);
 	 DECLARE @MethodOfUseKey as varchar(40); 
 	 set @MethodOfUseKey =   'MethodOfUse';
@@ -17,6 +18,7 @@ begin
 
 	 if @DrugJSON is null
 	 begin
+	 	print 'No Drug of Concern JSON'
 		return -1
 	 end
 	 if @concernRank = 1
@@ -66,26 +68,25 @@ begin
 
 	  insert into DrugOfConcern
 	  (
-      SurveyId,
+      
       DrugId, MethodOfUseId, DrugUnitId, ConcernRank, 
       AgeFirstUsed, AgeLastUsed, DaysInlast28, GoalId
     )
+	OUTPUT inserted.ID INTO @IDs(ID)
     values
 	  (
-        @surveyId,
         --DrugId:
-        (select ID from DrugType where Name = @drug),
+        (select ID from lk_Drugs where Name = @drug),
         --MethodOfUseId:
-        (select ID from MethodOfUseTypes where Name = @methodOfUse),        
+        (select ID from lk_MethodOfUse where Name = @methodOfUse),        
         -- Units
-        (select ID from DrugUnitTypes where Name = @units),
+        (select ID from lk_DrugUnit where Name = @units),
         @concernRank,
         @ageFirstUsed,
         @ageLastUsed,
         cast (@daysInLast28 as tinyint),
         -- Goals
-        (select ID from DrugUseGoalTypes where Name = @goal)
+        (select ID from lk_DrugUseGoal where Name = @goal)
 	  )
-
-	return 0;
+	SELECT @drugOfConcernId = ID FROM @IDs;
 end

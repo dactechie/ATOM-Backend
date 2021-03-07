@@ -1,4 +1,5 @@
 
+
 -- A2.
 CREATE TABLE ClientCurrentSituation (
   ID int not null PRIMARY key,
@@ -26,11 +27,12 @@ CREATE TABLE ClientCurrentSituation (
   ModifiedDate datetime DEFAULT CURRENT_TIMESTAMP
 );
 
+
 -- B2.  (many to one survey)
 CREATE TABLE DrugOfConcern
 (
   ID int not null IDENTITY PRIMARY key,
-  SurveyId int not null,
+  SurveyId int,
   CONSTRAINT FK_DoC_Survey FOREIGN KEY (SurveyId) REFERENCES Survey(ID),
 
   ConcernRank tinyint,
@@ -50,6 +52,24 @@ CREATE TABLE DrugOfConcern
   GoalId tinyint,
   CONSTRAINT FK_DoC_Goal FOREIGN KEY (GoalId) REFERENCES lk_DrugUseGoal(ID),
 )
+
+
+
+-- BB2.  (one to one survey)
+CREATE TABLE PrincipalDrugOfConcern(
+  ID int not null IDENTITY PRIMARY key,
+  
+  ClientId int not null,
+  CONSTRAINT FK_PDC_Client FOREIGN KEY (ClientId) REFERENCES Client(ID),
+
+  SurveyId int not null unique,
+  CONSTRAINT FK_PDC_Survey FOREIGN KEY (SurveyId) REFERENCES Survey(ID),
+
+  PDCDrugId int not null,
+  CONSTRAINT FK_PDC_lkDrug FOREIGN KEY (PDCDrugId) REFERENCES DrugOfConcern(ID)
+);
+
+
 
 
 -- C2 one to one with survey
@@ -94,27 +114,28 @@ create table RecentLifestyleImpactConcern
   CONSTRAINT FK_Lifestyle_DegrOfSafety FOREIGN KEY (DoYouFeelSafeWhereYouLive) REFERENCES lk_DegreesOfSafety(ID),
 
   YourCurrentHousing tinyint, -- stable / at risk of eviction / couch surfing homeless
-  CONSTRAINT FK_LifestyleCurrentHousing_FreqLowGood FOREIGN KEY (YourCurrentHousing) REFERENCES lk_HousingStability(ID), 
+  CONSTRAINT FK_LifestyleCurrentHousing_FreqLowGood FOREIGN KEY (YourCurrentHousing) REFERENCES lk_HousingStability(ID),
   
   Past4WkDifficultyFindingHousing tinyint,
-  CONSTRAINT FK_LifestyleFindingHousing_FreqLowGood FOREIGN KEY (Past4WkDifficultyFindingHousing) REFERENCES lk_FrequencyLowGood(Score), 
+  CONSTRAINT FK_LifestyleFindingHousing_FreqLowGood FOREIGN KEY (Past4WkDifficultyFindingHousing) REFERENCES lk_FrequencyLowGood(Score),
 
   Past4WkHowOftenPhysicalHealthCausedProblems tinyint,
-  CONSTRAINT FK_LifestylePhysicalProb_FreqLowGood FOREIGN KEY (Past4WkHowOftenPhysicalHealthCausedProblems) REFERENCES lk_FrequencyLowGood(Score), 
+  CONSTRAINT FK_LifestylePhysicalProb_FreqLowGood FOREIGN KEY (Past4WkHowOftenPhysicalHealthCausedProblems) REFERENCES lk_FrequencyLowGood(Score),
 
   Past4WkHowOftenMentalHealthCausedProblems tinyint,
-  CONSTRAINT FK_LifestyleMentalProb_FreqLowGood FOREIGN KEY (Past4WkHowOftenMentalHealthCausedProblems) REFERENCES lk_FrequencyLowGood(Score), 
+  CONSTRAINT FK_LifestyleMentalProb_FreqLowGood FOREIGN KEY (Past4WkHowOftenMentalHealthCausedProblems) REFERENCES lk_FrequencyLowGood(Score),
+
+  WhenMentalHealthDiagnosisId tinyint,
+  CONSTRAINT FK_LifestyleMentalDiag_lkHowLongAgo FOREIGN KEY (WhenMentalHealthDiagnosisId) REFERENCES lk_HowLongAgo(ID),
 
   Past4WkUseLedToProblemsWithFamilyFriend tinyint,
-  CONSTRAINT FK_LifestyleFamFriendProb_FreqLowGood FOREIGN KEY (Past4WkUseLedToProblemsWithFamilyFriend) REFERENCES lk_FrequencyLowGood(Score), 
+  CONSTRAINT FK_LifestyleFamFriendProb_FreqLowGood FOREIGN KEY (Past4WkUseLedToProblemsWithFamilyFriend) REFERENCES lk_FrequencyLowGood(Score),
 
   Past4WkHowOftenIllegalActivities tinyint,
-  CONSTRAINT FK_LifestyleIllegalAct_FreqLowGood FOREIGN KEY (Past4WkHowOftenIllegalActivities) REFERENCES lk_FrequencyLowGood(Score), 
+  CONSTRAINT FK_LifestyleIllegalAct_FreqLowGood FOREIGN KEY (Past4WkHowOftenIllegalActivities) REFERENCES lk_FrequencyLowGood(Score),
 
-  Past4WkHaveDVOrFamilySafetyConcerns bit,
-  -- Do you have any domestic violence or family safety concerns?
-  Past4WkHaveYouViolenceAbusive bit,
-  -- Have you used violence or been abusive towards anyone, over the last 4 weeks?
+  Past4WkHaveDVOrFamilySafetyConcerns bit, -- Do you have any domestic violence or family safety concerns?
+  Past4WkHaveYouViolenceAbusive bit, -- Have you used violence or been abusive towards anyone, over the last 4 weeks?
   Past4WkHadCaregivingResponsibilities bit,
   Past4WkBeenArrested bit,
   
@@ -202,7 +223,7 @@ create table PrimaryCaregiverDetail
 	SurveyId int not null,
 	CONSTRAINT FK_Risk_Survey FOREIGN KEY (SurveyId) REFERENCES Survey(ID),
 
-	RiskId tinyint,
+	RiskId tinyint not null,
 	CONSTRAINT FK_ClientRisk_lkRisk FOREIGN KEY (RiskId) REFERENCES lk_Risk(ID),
  )
 

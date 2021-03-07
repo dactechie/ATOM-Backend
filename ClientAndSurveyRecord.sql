@@ -10,7 +10,6 @@ CREATE Table Client (
   -- add index to all client's surveys
 );
 
-
 CREATE table Survey (
   ID int not null IDENTITY PRIMARY key,
   
@@ -23,15 +22,7 @@ CREATE table Survey (
   
   ProgramId smallint not null,
   CONSTRAINT FK_Survey_lkProgram FOREIGN KEY (ProgramId) REFERENCES lk_Program(ID),
-  
-  PDCDrugId smallint not null,
-  CONSTRAINT FK_Survey_lkDrug FOREIGN KEY (PDCDrugId) REFERENCES lk_Drugs(ID),
  
-  PDCAgeFirstUsed tinyint,
-
-  WhenMentalHealthDiagnosisId tinyint, -- to be made into lookup
-  CONSTRAINT FK_SurveyMentalDiag_lkHowLongAgo FOREIGN KEY (WhenMentalHealthDiagnosisId) REFERENCES lk_HowLongAgo(ID),
-  
   HaveYouEverInjected bit, -- ? -- not on client because it is useful to know when they had/declared it
   HaveYouServedCustodialSentenceInPast bit, -- not on client because it is useful to know when they had/declared it
   EverDiagnosedMentalHealthIssue bit, -- ? -- not on client because it is useful to know when they had/declared it
@@ -41,6 +32,7 @@ CREATE table Survey (
 
 
   -- drop table ClientCurrentSituation -- A2
+  -- drop table PrincipalDrugOfConcern
   -- drop table DrugOfConcern --B2
   -- drop table InjectingDrugDetails --C2
   -- drop table OtherBehavioursOfDependence --D2
@@ -52,11 +44,14 @@ CREATE table Survey (
   -- drop table ClientRisk -- J2
   -- drop table SupportForGoals -- K2
   -- drop table Survey-- Level-1
-  --drop table Client
+  -- drop table Client
 
 -- SupportTypeBestMatchesNeedsGoals
 
 
-
--- linked one-one to survey 
-  --CurrentStageReviewId int FOREIGN KEY REFERENCES CurrentStageReview(ID),
+-- EXEC sp_addextendedproperty   
+-- @name = N'Caption',   
+-- @value = 'Do you have any domestic violence or family safety concerns?',  
+-- @level0type = N'Schema', @level0name = 'dbo',  
+-- @level1type = N'Table',  @level1name = 'RecentLifestyleImpactConcern',  
+-- @level2type = N'Column', @level2name = 'Past4WkHaveDVOrFamilySafetyConcerns'; 

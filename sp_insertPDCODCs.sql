@@ -1,41 +1,66 @@
 
-ALTER procedure sp_insertDrugs(
-                    @surveyId as int
-                   , @json varchar(max))
+alter procedure sp_insertDrugs(
+                     @json varchar(max)
+                   , @PDCId int OUTPUT              
+                   )
 as 
 begin
     DECLARE @PDCJSON as VARCHAR(MAX);
     DECLARE @ODCnJSON as VARCHAR(MAX);
-    DECLARE @i as int;
-    DECLARE @rank as tinyint;
-
-    set @rank = 1;
 
     set @PDCJSON =   JSON_QUERY(@json, '$.PDC[0]')
-    exec sp_insertDrug  @surveyId = @surveyId
-    						,@DrugJSON = @PDCJSON
-    						,@concernRank = @rank
-
-    set @rank = 2;
-    DECLARE @str as VARCHAR (20);
-    set @i = 0;
-
-    while @i < 5 
-    begin
-        set @ODCnJSON =   JSON_QUERY(@json, N'strict $.ODC['+   cast( @i  as varchar(1))  + ']');      
-        if @ODCnJSON = '{}'
-        begin
-          set @i = @i +1
-          continue
-        end
+    exec sp_insertDrug @DrugJSON = @PDCJSON
+    						,@concernRank = 1
+                , @drugOfConcernId = @PDCId output
   
-        exec sp_insertDrug  @surveyId = @surveyId
-              ,@DrugJSON = @ODCnJSON
-              ,@concernRank = @rank
+    set @ODCnJSON = JSON_QUERY(@json, '$.ODC')
+    if @ODCnJSON is null
+      RETURN
 
-        set @rank = @rank + 1;
-        set @i = @i + 1;
-    end
+    DECLARE @t TABLE (OtherSubstancesConcernGambling nvarchar(100), AgeFirstUsed int,
+                    AgeLastUsed int, MethodOfUse NVARCHAR(50), DaysInLast28 CHAR(5), 
+                    HowMuchPerOccasion NVARCHAR(25), Units VARCHAR(20)
+                    , Goals VARCHAR(100), Concern tinyint);
+
+    insert into @t
+   SELECT  OtherSubstancesConcernGambling, AgeFirstUsed,  AgeLastUsed, MethodOfUse
+            , DaysInLast28,  HowMuchPerOccasion, Units, Goals
+            , ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS Concern
+        FROM OPENJSON(@ODCnJSON)
+        WITH (
+            OtherSubstancesConcernGambling NVARCHAR(100) '$.OtherSubstancesConcernGambling',
+            AgeFirstUsed INT '$.AgeFirstUsed',        
+            AgeLastUsed int '$.AgeLastUsed',
+            MethodOfUse NVARCHAR(50) '$.MethodOfUse',
+            DaysInLast28 VARCHAR(5) '$.DaysInLast28',        
+            HowMuchPerOccasion NVARCHAR(25) '$.HowMuchPerOccasion',        
+            Units NVARCHAR(20) '$.Units',
+            Goals NVARCHAR(100) '$.Goals'
+        );
+        
+    DECLARE @IDs TABLE(ID INT);
+    insert into DrugOfConcern
+        (          
+          DrugId, MethodOfUseId, DrugUnitId, ConcernRank, 
+          AgeFirstUsed, AgeLastUsed, DaysInlast28, GoalId
+        )
+      OUTPUT inserted.ID INTO @IDs(ID)
+      select 
+              --DrugId:
+            (select ID from lk_Drugs where Name = OtherSubstancesConcernGambling),
+            --MethodOfUseId:
+            (select ID from lk_MethodOfUse where Name = MethodOfUse),        
+            -- Units
+            (select ID from lk_DrugUnit where Name = Units),
+            Concern + 1,
+            AgeFirstUsed,
+            AgeLastUsed,
+            cast (DaysInLast28 as tinyint),
+            -- Goals
+            (select ID from lk_DrugUseGoal where Name = Goals)
+    from @t;
+
+   select * from @IDs;
 
 END
 
