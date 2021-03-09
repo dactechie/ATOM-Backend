@@ -1,71 +1,37 @@
+DECLARE @json nvarchar(max) ;
+DECLARE @SurveyJSON nvarchar(MAX);
+DECLARE @AssessmentType varchar(40);
+DECLARE @Program varchar(10);
+DECLARE @surveyID int;
+DECLARE @SLK char(14);
+DECLARE @ClientID int;
 
-
-
-DECLARE @all NVARCHAR(MAX);
-DECLARE @SLK VARCHAR(24);
-
-set @all= 
-'{"SLK":"ALLFT210719812","ID":"ALLFT210719812","AssessmentDate":"2021-03-04","ClientType":"ownuse","PDC":[{"PDCSubstanceOrGambling":"Methadone",
-"PDCMethodOfUse":"Sniff (powder)","PDCDaysInLast28":"15","PDCGoals":"Reduce Harms"}],"Anyodc":"no",
-"ODC": [{
-      "AgeFirstUsed": 20,
-      "AgeLastUsed": 22,
-      "DaysInLast28": "0",
-      "Goals": "No Goals - Ceased Use",
-      "HowMuchPerOccasion": "1",
-      "MethodOfUse": "Ingest",
-      "OtherSubstancesConcernGambling": "Amphetamines",
-      "Units": "points"
-    },
-    {
-      "AgeFirstUsed": 21,
-      "AgeLastUsed": 23,
-      "DaysInLast28": "0",
-      "Goals": "No Goals - Ceased Use",
-      "HowMuchPerOccasion": "1",
-      "MethodOfUse": "Ingest",
-      "OtherSubstancesConcernGambling": "Psychostimulants",
-      "Units": "pills"
-    }],
-
-
-"HaveYouEverInjected":"No","SDSDoesMissingFixMakeAnxious":"0",
-"SDSDoYouWishToStop":"0","Past4WkAodRisks":["Driving with drugs and/or alcohol in your system","Blackouts"],
-"Past4WkEngagedInOtheractivities":{"Paid Work":{"Frequency":"Once or twice per week","Days":"16"}},
-"HowDoYouSpendTime":{"HobbiesSportsRecreation":"Yes","MeTime":"Too Little "},"Past4WkDailyLivingImpacted":"Once or twice a week",
-"PrioritiseCare":"Reasonably well","EverydayLivingITSPIssues":"everyday living issues notese","EverydayLivingITSPGoals":"everyday living issues goals",
-"UsualAccommodation":"Domestic-scale supported living facility","LivingArrangement":"Friend(s)/parent(s)/relative(s) and child(ren)",
-"YourCurrentHousing":"Some issues - but mostly ok","Past4WkDifficultyFindingHousing":"Once or twice per week","DoYouFeelSafeWhereYouLive":"Often feel unsafe / Occasionally experience violence",
-"Past4WkPhysicalHealth":"5","Past4WkHowOftenPhysicalHealthCausedProblems":"Less than weekly","Past4WkBeenHospCallAmbulance":"No","AreYouCurrentlyTakingMeds":"Yes","MedicationsNotes":"some meds",
-"HealthChecklist_STAFF":["Vaccinations"],"Past4WkMentalHealth":"2","Past4WkHowOftenMentalHealthCausedProblems":"Once or twice per week",
-
-"EverDiagnosedMentalHealthIssue":"Yeo",
-
-"MHRecentRiskIssues":["Suicide of significant other","Recent sexual abuse"],"MHHistoricalRiskIssues":["Serious, ongoing physical illness"],
-"Past4WkUseLedToProblemsWithFamilyFriend":"Daily or almost daily","HaveAnySocialSupport":"Quite a lot","HaveDVOrFamilySafetyConcerns":"Yes - in the past 4 weeks (risk assessment required)",
-"Past4WkHaveYouViolenceAbusive":"No","Past4WkHadCaregivingResponsibilities":"Yes","PrimaryCaregiver":["Yes - parenting responsibilities for children other than my own",
-"Yes - primary caregiver: children 5 - 15 years old"],"ChildProtectionConcerns":"Yes","ChildProtectionDetails":"some prot issues with children","RelationshipsITSPGoals":"relationsship goals",
-"Past4WkBeenArrested":"Yes",
-
-"HaveYouServedCustodialSentenceInPast":"No",
-
-"Past4WkHowOftenIllegalActivities":"Less than weekly","SubjectToCourtOrdersOrPendingCharges":"No",
-"NeedHelpWrkDevlpmntOrdrPayingOutstndngFines":"Yes","HowCloseToManagingSubstanceUse":"4","HowImportantIsChangeToYou":"Really important. I''d like to change",
-"Past4WkQualityOfLifeScore":"8","HowSatisfiedWithProgress":"Slightly","AreYouAccessingOtherServices":"Yes","SupportFromWhichOtherServices":["Other community health care service"],
-"SupportTypeBestMatchesNeedsGoals":["Case Management","Aboriginal Health Worker"],"ExternalReferrals":["Everyday Living","Relationships / Parenting / Social Wellbeing"],
-"RiskAssessmentChecklist":["IndicationSuicide"],"FinalChecklist":["ConsentToShareInfo"],"RiskAssessmentNotes":"ris k notes","SDSIsAODUseOutOfControl":"2","SDSHowDifficultToStopOrGoWithout":"2",
-"SDSHowMuchDoYouWorryAboutAODUse":"3","SDS_Score":7,"CreatedDatetime":"04/03/2021 12:50:49 PM"}'
+set @json = N'{
+  "Program": "TSS",
+  "Staff": "Lexxie.Jury",
+  "SurveyID": "8a434de3-a367-42ea-a5a2-21a95cb1d65c",
+  "Status": "Complete",
+  "SurveyData": "{\"SLK\":\"KESUS180119811\",\"AssessmentDate\":\"2021-03-09\",\"ClientType\":\"ownuse\",\"PDC\":[{\"PDCSubstanceOrGambling\":\"Alcohol\",\"PDCMethodOfUse\":\"Ingest\",\"PDCDaysInLast28\":\"0\",\"PDCUnits\":\"standard drinks\",\"PDCHowMuchPerOccasion\":\"0\",\"PDCAgeFirstUsed\":15,\"PDCAgeLastUsed\":40,\"PDCGoals\":\"Cease Use\"}],\"PDCnotes\":\"Reduce quit .\",\"Anyodc\":\"yes\",\"ODC\":[{\"OtherSubstancesConcernGambling\":\"Cannabinoids and related drugs\",\"MethodOfUse\":\"Smoke\",\"DaysInLast28\":\"0\",\"Units\":\"cones / joints\",\"HowMuchPerOccasion\":\"5\",\"AgeFirstUsed\":15,\"AgeLastUsed\":38,\"Goals\":\"Maintain Abstinence\"},{},{},{},{}],\"NotesODC\":\"Stopped using 2 years ago.\",\"HaveYouEverInjected\":\"No\",\"SDSIsAODUseOutOfControl\":\"2\",\"SDSDoesMissingFixMakeAnxious\":\"0\",\"SDSHowMuchDoYouWorryAboutAODUse\":\"0\",\"SDSDoYouWishToStop\":\"1\",\"SDSHowDifficultToStopOrGoWithout\":\"0\",\"SDS_Score\":3,\"Past4WkAodRisks-Comment\":\"Stopped drinking 4 weeks ago.\",\"Past4WkAnyOtherAddictiveB\":\"No\",\"SubstanceUseITSPGoals\":\"To competly stop. just need support with that.\",\"Past4WkEngagedInOtheractivities\":{\"Paid Work\":{\"Frequency\":\"Daily or almost daily\",\"Days\":\"20\"},\"Voluntary Work\":{\"Frequency\":\"Not at all\"},\"Study - college, school or vocational education\":{\"Frequency\":\"Less than weekly\",\"Days\":\"1\"},\"Looking after children\":{\"Frequency\":\"Daily or almost daily\",\"Days\":\"20\"},\"Other caregiving activities\":{\"Frequency\":\"Not at all\"}},\"HowDoYouSpendTime\":{\"HobbiesSportsRecreation\":\"Yes\",\"FamilyHome\":\"Yes\",\"MeTime\":\"Yes\",\"OtherBehavioursDependence\":\"Too Much\",\"WorkOrStudy\":\"Yes\"},\"Past4WkDailyLivingImpacted\":\"Not at all\",\"PrioritiseCare\":\"Reasonably well\",\"EverydayLivingITSPIssues\":\"Childhood trauma. Sexual abuse as a child.\",\"EverydayLivingITSPGoals\":\"Wanting to get to the point where he can stop taking medication.\",\"UsualAccommodation\":\"Private residence\",\"LivingArrangement\":\"Spouse/partner and child(ren)\",\"HousingSafetyITSPIssues\":\"Stays at property by himself about once or twice a week.\",\"YourCurrentHousing\":\"Stable permanent housing\",\"Past4WkDifficultyFindingHousing\":\"Not at all\",\"DoYouFeelSafeWhereYouLive\":\"Yes - Completely safe\",\"Past4WkPhysicalHealth\":\"5\",\"Past4WkHowOftenPhysicalHealthCausedProblems\":\"Not at all\",\"Past4WkBeenHospCallAmbulance\":\"No\",\"AreYouCurrentlyTakingMeds\":\"Yes\",\"MedicationsNotes\":\"Efelon, fluoxatine, \",\"Past4WkMentalHealth\":\"6\",\"Past4WkHowOftenMentalHealthCausedProblems\":\"Less than weekly\",\"EverDiagnosedMentalHealthIssue\":\"Yes\",\"WhenMentalHealthDiagnosis-Comment\":\"PTSD 2020, childhood trauma 2020, childhood trauma/abuse 2020,\",\"MHHistoricalRiskIssues\":[\"History of mental health issues\",\"Past sexual abuse\",\"History of impulsive and/or aggressive actions\"],\"MHHistoricalRiskIssues-Comment\":\"History of suicidal thought, never acted on them.\",\"MentalHealthITSPGoals\":\"Help with the past trauma. Would like help to rewire his brain.\",\"WhenMentalHealthDiagnosis\":\"More than 12 months ago\",\"HaveAnySocialSupport\":\"Some\",\"Past4WkUseLedToProblemsWithFamilyFriend\":\"Less than weekly\",\"HaveDVOrFamilySafetyConcerns\":\"No\",\"Past4WkHaveYouViolenceAbusive\":\"No\",\"Past4WkHadCaregivingResponsibilities\":\"Yes\",\"PrimaryCaregiver\":[\"Yes - parenting responsibilities for children other than my own\"],\"PrimaryCaregiver-Comment\":\"No\",\"ChildProtectionConcerns\":\"No\",\"HaveYouServedCustodialSentenceInPast\":\"No\",\"Past4WkBeenArrested\":\"No\",\"Past4WkHowOftenIllegalActivities\":\"Not at all\",\"SubjectToCourtOrdersOrPendingCharges\":\"No\",\"NeedHelpWrkDevlpmntOrdrPayingOutstndngFines\":\"No\",\"HowImportantIsChangeToYou\":\"Critical for me. I need to change\",\"HowCloseToManagingSubstanceUse\":\"6\",\"HowSatisfiedWithProgress\":\"Slightly\",\"Past4WkQualityOfLifeScore\":\"7\",\"AreYouAccessingOtherServices\":\"No\",\"SupportTypeBestMatchesNeedsGoals\":[\"AOD counselling & support (3 - 6 sessions, then review)\"],\"CreatedDatetime\":\"09/03/2021 3:46:31 PM\"}",
+  "SurveyName": "ATOM Initial Assessment",
+  "IsActive": 1,
+  "RowKey": "TSS_INAS_20210309",
+  "PartitionKey": "KESUS180119811"
+}';
 
 
 DECLARE @datestring varchar (10);
-DECLARE @clientID int, @surveyID int;
-set @SLK  = 'ALLFT210719812'
 
-EXEC dbo.sp_createClient @SLK=@SLK, @clientID=@clientID OUTPUT
+
+set @SLK  = JSON_VALUE(@json, '$.PartitionKey');
+set @Program  = JSON_VALUE(@json, '$.Program');
+set @AssessmentType  =  JSON_VALUE(@json, '$.SurveyName');
+set @SurveyJSON = JSON_VALUE(@json, '$.SurveyData')
+
+EXEC dbo.sp_createClient @SLK=@SLK, @clientID=@ClientID OUTPUT
 
 
 -- note : see simple way to go fomr JSON to SQL table example 5 : https://docs.microsoft.com/en-us/sql/t-sql/functions/openjson-transact-sql?view=sql-server-ver15
-EXEC dbo.sp_createSurvey @SurveyJSON=@all, @clientID=@clientID, @surveyId=@surveyID output
+EXEC dbo.sp_createSurvey @SurveyJSON=@SurveyJSON, @ClientID=@ClientID, @AssessType=@AssessmentType, @Program=@Program, @SurveyId=@surveyID output
 
 select @surveyID
 

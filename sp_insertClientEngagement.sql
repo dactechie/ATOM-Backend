@@ -1,4 +1,4 @@
-ALTER PROCEDURE sp_insertClientEngagement(
+CREATE PROCEDURE sp_insertClientEngagement(
 						@surveyId int
 						,@fullJSON nvarchar(max)
 						)
@@ -7,10 +7,8 @@ begin
 	 DECLARE @engagementJSON NVARCHAR(MAX);
 	 set @engagementJSON =   JSON_QUERY(@fullJSON, '$.Past4WkEngagedInOtheractivities')
 	 if @engagementJSON is null
-	 begin
-		return
-	 end
-
+      return
+	
     DECLARE @EngagementFrequency nvarchar(30)
             , @EngagementDays nvarchar(5)
             , @EngagementDaysInt tinyint
@@ -43,10 +41,10 @@ begin
 						SurveyId,
 						EngagementTypeId, EngagementDays, EngagementFrequency) values 
           (
-			  @surveyId,
-			  (select ID from EngagementType where Name = @EngagementType),
-			  @EngagementDaysInt,
-			  (select F.Score from dbo.FrequencyHighGood F where F.Name = @EngagementFrequency)
+            @surveyId,
+            (select ID from lk_Engagement where Name = @EngagementType),
+            @EngagementDaysInt,
+            (select F.Score from lk_FrequencyHighGood F where F.Name = @EngagementFrequency)
           )
 	
 	  set @EngagementFrequency = null;

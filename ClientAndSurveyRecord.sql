@@ -26,7 +26,9 @@ CREATE table Survey (
   HaveYouEverInjected bit, -- ? -- not on client because it is useful to know when they had/declared it
   HaveYouServedCustodialSentenceInPast bit, -- not on client because it is useful to know when they had/declared it
   EverDiagnosedMentalHealthIssue bit, -- ? -- not on client because it is useful to know when they had/declared it
- 
+  
+  CreatedDate datetime DEFAULT CURRENT_TIMESTAMP,
+
   UNIQUE (ClientId, AssessmentDate, ProgramId)
 );
 

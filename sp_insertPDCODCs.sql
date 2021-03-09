@@ -23,7 +23,7 @@ begin
                     , Goals VARCHAR(100), Concern tinyint);
 
     insert into @t
-   SELECT  OtherSubstancesConcernGambling, AgeFirstUsed,  AgeLastUsed, MethodOfUse
+    SELECT  OtherSubstancesConcernGambling, AgeFirstUsed,  AgeLastUsed, MethodOfUse
             , DaysInLast28,  HowMuchPerOccasion, Units, Goals
             , ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS Concern
         FROM OPENJSON(@ODCnJSON)
@@ -58,9 +58,10 @@ begin
             cast (DaysInLast28 as tinyint),
             -- Goals
             (select ID from lk_DrugUseGoal where Name = Goals)
-    from @t;
+    from @t
+      where OtherSubstancesConcernGambling is not null;
 
-   select * from @IDs;
+   select ID from @IDs;
 
 END
 
