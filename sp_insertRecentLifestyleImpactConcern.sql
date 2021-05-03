@@ -18,7 +18,11 @@
     --   "Once or twice a week",<<<-- PROB:LEM  'a' week not per
      -- "Three or four times a week",  <<<-- PROB:LEM  'a' week not per
 
-ALTER PROCEDURE sp_insertRecentLifestyleImpactConcern(@json nvarchar(max), @insertedId int output)
+CREATE PROCEDURE sp_insertRecentLifestyleImpactConcern(
+		@SurveyID int
+		, @SurveyJSON nvarchar(max)
+		--, @insertedId int output
+		)
 as 
 	DECLARE @diffHousing varchar(30), @phyHealth varchar(2), @mentHealth varchar(2),
 			@phyHealthProb varchar(30), @menHealthProb varchar(30),
@@ -28,44 +32,43 @@ as
 			@NoYesString varchar(40),
 			--@arrested varchar(3), @violentAbusive varchar(30),	@careGiving varchar(3),
 
-			@Past4WkHaveDVOrFamilySafetyConcerns bit, @Past4WkBeenArrested bit, @Past4WkHaveYouViolenceAbusive bit, @Past4WkHadCaregivingResponsibilities bit,
+			@Past4WkHaveDVOrFamilySafetyConcerns bit, @Past4WkBeenArrested bit,
+			@Past4WkHaveYouViolenceAbusive bit, @Past4WkHadCaregivingResponsibilities bit,
 			@Past4WkHowOftenIllegalActivities varchar(30),
 			@Past4WkQualityOfLifeScore varchar(2);
-			
-
-	set @diffHousing = JSON_VALUE(@json, '$.Past4WkDifficultyFindingHousing');
-	set @phyHealth = JSON_VALUE(@json, '$.Past4WkPhysicalHealth');
-	set @mentHealth = JSON_VALUE(@json, '$.Past4WkMentalHealth');
-
-	set @phyHealthProb = JSON_VALUE(@json, '$.Past4WkHowOftenPhysicalHealthCausedProblems');
-	set @menHealthProb = JSON_VALUE(@json, '$.Past4WkHowOftenMentalHealthCausedProblems');
-	set @Past4WkUseLedToProblemsWithFamilyFriend = JSON_VALUE(@json, '$.Past4WkUseLedToProblemsWithFamilyFriend');
-
-	set @DoYouFeelSafeWhereYouLive = JSON_VALUE(@json, '$.DoYouFeelSafeWhereYouLive');
-	set @YourCurrentHousing = JSON_VALUE(@json, '$.YourCurrentHousing');
 	
-	set @NoYesString = JSON_VALUE(@json, '$.HaveDVOrFamilySafetyConcerns');
+	set @diffHousing = JSON_VALUE(@SurveyJSON, '$.Past4WkDifficultyFindingHousing');
+	set @phyHealth = JSON_VALUE(@SurveyJSON, '$.Past4WkPhysicalHealth');
+	set @mentHealth = JSON_VALUE(@SurveyJSON, '$.Past4WkMentalHealth');
+	set @phyHealthProb = JSON_VALUE(@SurveyJSON, '$.Past4WkHowOftenPhysicalHealthCausedProblems');
+	set @menHealthProb = JSON_VALUE(@SurveyJSON, '$.Past4WkHowOftenMentalHealthCausedProblems');
+	set @Past4WkUseLedToProblemsWithFamilyFriend = JSON_VALUE(@SurveyJSON, '$.Past4WkUseLedToProblemsWithFamilyFriend');
+
+	set @DoYouFeelSafeWhereYouLive = JSON_VALUE(@SurveyJSON, '$.DoYouFeelSafeWhereYouLive');
+	set @YourCurrentHousing = JSON_VALUE(@SurveyJSON, '$.YourCurrentHousing');
+	
+	set @NoYesString = JSON_VALUE(@SurveyJSON, '$.HaveDVOrFamilySafetyConcerns');
 	if @NoYesString is not null
 		if @NoYesString = 'No'--"No",  -- "Yes (risk assessment required)"
 			set @Past4WkHaveDVOrFamilySafetyConcerns  = 0 
 		else
 			set @Past4WkHaveDVOrFamilySafetyConcerns = 1
 
-	set @NoYesString = JSON_VALUE(@json, '$.Past4WkBeenArrested');
+	set @NoYesString = JSON_VALUE(@SurveyJSON, '$.Past4WkBeenArrested');
 	if @NoYesString is not null
 		if @NoYesString = 'No'--"No",  -- "Yes (risk assessment required)"
 			set @Past4WkBeenArrested  = 0 
 		else
 			set @Past4WkBeenArrested = 1
 
-	set @NoYesString = JSON_VALUE(@json, '$.Past4WkHaveYouViolenceAbusive');
+	set @NoYesString = JSON_VALUE(@SurveyJSON, '$.Past4WkHaveYouViolenceAbusive');
 	if @NoYesString is not null
 		if @NoYesString = 'No'--"No",  -- "Yes (risk assessment required)"
 			set @Past4WkHaveYouViolenceAbusive  = 0 
 		else
 			set @Past4WkHaveYouViolenceAbusive = 1
 
-	set @NoYesString = JSON_VALUE(@json, '$.Past4WkHadCaregivingResponsibilities');
+	set @NoYesString = JSON_VALUE(@SurveyJSON, '$.Past4WkHadCaregivingResponsibilities');
 	if @NoYesString is not null
 		if @NoYesString = 'No'--"No",  -- "Yes"
 			set @Past4WkHadCaregivingResponsibilities  = 0 
@@ -73,10 +76,11 @@ as
 			set @Past4WkHadCaregivingResponsibilities = 1
 	
 
-	set @Past4WkHowOftenIllegalActivities = JSON_VALUE(@json, '$.Past4WkHowOftenIllegalActivities');
-	set @Past4WkQualityOfLifeScore = JSON_VALUE(@json, '$.Past4WkQualityOfLifeScore');
+	set @Past4WkHowOftenIllegalActivities = JSON_VALUE(@SurveyJSON, '$.Past4WkHowOftenIllegalActivities');
+	set @Past4WkQualityOfLifeScore = JSON_VALUE(@SurveyJSON, '$.Past4WkQualityOfLifeScore');
 	
 	insert into RecentLifestyleImpactConcern (
+				SurveyId,
 				DoYouFeelSafeWhereYouLive,
 				YourCurrentHousing,
 				Past4WkPhysicalHealth,
@@ -94,15 +98,15 @@ as
 				) 
 	values
 	(
-
-		cast(@phyHealth as tinyint),
-		cast(@mentHealth as tinyint),
+		@SurveyID,
 		--DoYouFeelSafeWhereYouLive
 		(select F.ID from dbo.lk_DegreesOfSafety F where F.Name = @DoYouFeelSafeWhereYouLive),
 	
 		--YourCurrentHousing
 		(select F.ID from dbo.lk_HousingStability F where F.Name = @YourCurrentHousing),
 
+		cast(@phyHealth as tinyint),
+		cast(@mentHealth as tinyint),
 
 		--Past4WkDifficultyFindingHousing
 		(select F.Score from dbo.lk_FrequencyLowGood F where F.Name = @diffHousing),
@@ -132,6 +136,6 @@ as
 		cast(@Past4WkQualityOfLifeScore as tinyint)
 	)
 
-	set @insertedId = SCOPE_IDENTITY();
+--	set @insertedId = SCOPE_IDENTITY();
 return
 
